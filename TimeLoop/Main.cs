@@ -17,9 +17,11 @@ namespace TimeLoop
 
         public void InitMod(Mod _modInstance)
         {
+            Log.Out("[TimeLoop] Initializing ...");
             ModEvents.GameAwake.RegisterHandler(Awake);
             ModEvents.GameUpdate.RegisterHandler(Update);
             ModEvents.PlayerLogin.RegisterHandler(PlayerLogin);
+            Log.Out("[TimeLoop] Initialized!");
         }
 
         private void Awake()
@@ -34,20 +36,27 @@ namespace TimeLoop
         {
             if (GameManager.Instance != null && GameManager.IsDedicatedServer)
             {
+                Serializer.Instance.CheckForUpdate();
                 this.timeLooper?.Update();
             }
         }
 
         private bool PlayerLogin(ClientInfo cInfo, string message, StringBuilder stringBuild)
         {
-            if (GameManager.Instance != null && GameManager.IsDedicatedServer && cInfo != null && cInfo.loginDone)
+            if (GameManager.Instance != null && GameManager.IsDedicatedServer && cInfo != null)
             {
                 if (cInfo.CrossplatformId != null)
                 {
-                    if (!Serializer.Instance.PlayerData.Exists(x => x.clientInfo.CrossplatformId.CombinedString == cInfo.CrossplatformId.CombinedString))
+                    if (Serializer.Instance.PlayerData?.Exists(x => x.CrossplatformId == cInfo.CrossplatformId.CombinedString) == false)
                     {
                         Serializer.Instance.PlayerData.Add(new PlayerData(cInfo));
+                        #region WORKAROUND
+                        // Workaround since something is broken here. With Unity I can usually use JsonUtility.ToJson to serialize lists of custom classes, not here though ....
+                        Serializer.Instance.CrossplatformId.Add(cInfo.CrossplatformId.CombinedString);
+                        Serializer.Instance.SkipTimeLoop.Add(false);
+                        #endregion
                         Serializer.Instance.SaveConfig();
+                        Log.Out($"[TimeLoop] Player added to config. {Serializer.Instance.PlayerData.Last().CrossplatformId}");
                     }
                 }
             }

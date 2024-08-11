@@ -17,9 +17,6 @@ namespace TimeLoop.Modules
 
         public void Update()
         {
-            //Log.Out("Game Update!");
-
-
             List<ClientInfo> clients = GetConnectedClients();
             for (int i = 0; i < clients.Count; i++)
             {
@@ -29,9 +26,8 @@ namespace TimeLoop.Modules
                     continue;
                 }
 
-                PlayerData data = Serializer.Instance.PlayerData.Find(x => x.clientInfo.PlatformId.CombinedString == cInfo.PlatformId.CombinedString 
-                                                                        || x.clientInfo.CrossplatformId.CombinedString == cInfo.CrossplatformId.CombinedString);
-                if (data?.skipTimeLoop == true)
+                PlayerData data = Serializer.Instance.PlayerData?.Find(x => x.CrossplatformId == cInfo.CrossplatformId.CombinedString);
+                if (data?.SkipTimeLoop == true)
                 {
                     return;
                 }
@@ -41,6 +37,7 @@ namespace TimeLoop.Modules
             ulong dayTime = GameManager.Instance.World.GetWorldTime() % 24000;
             if (dayTime == 0)
             {
+                Log.Out("[TimeLoop] Time Reset.");
                 Message.SendChat("Resetting day. Please wait for an admin in order to experience the normal time flow! Type !adminlist to see available admins.");
                 int previousDay = GameUtils.WorldTimeToDays(GameManager.Instance.World.GetWorldTime()) - 1;
                 GameManager.Instance.World.SetTime(GameUtils.DaysToWorldTime(previousDay) + 1);
