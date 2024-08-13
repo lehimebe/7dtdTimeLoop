@@ -1,29 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#define XML_SERIALIZATION
+
+using Platform.Steam;
+using System;
+using System.Xml.Serialization;
 
 namespace TimeLoop.Functions
 {
+#if !XML_SERIALIZATION
     [Serializable]
+#endif
     public class PlayerData
     {
-        public string CrossplatformId;
+#if XML_SERIALIZATION
+        [XmlAttribute]
+#endif
+        public string ID;
+
+#if XML_SERIALIZATION
+        [XmlAttribute]
+#endif
         public bool SkipTimeLoop;
 
-        public PlayerData (ClientInfo clientInfo)
+
+        public PlayerData() 
         {
-            this.CrossplatformId = clientInfo.CrossplatformId.CombinedString;
+            this.ID = "12345678901234567";
             this.SkipTimeLoop = false;
         }
 
-        #region WORKAROUND
-        public PlayerData(string crossplatformId, bool skipTimeLoop)
+
+        public PlayerData(ClientInfo clientInfo)
         {
-            this.CrossplatformId = crossplatformId;
-            this.SkipTimeLoop = skipTimeLoop;
+            if (clientInfo.PlatformId != null && clientInfo.PlatformId is UserIdentifierSteam)
+            {
+                UserIdentifierSteam steamID = clientInfo.PlatformId as UserIdentifierSteam;
+                this.ID = steamID.SteamId.ToString();
+            }
+            else
+            {
+                this.ID = clientInfo.CrossplatformId.CombinedString;
+            }
+            this.SkipTimeLoop = false;
         }
-        #endregion
     }
 }

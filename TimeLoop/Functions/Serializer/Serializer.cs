@@ -1,27 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
 using UnityEngine;
 
 namespace TimeLoop.Functions
 {
-    [Serializable]
+#if XML_SERIALIZATION
+    [XmlRoot("TimeLoopSettings")]
+#else
+    [Serializable]  
+#endif
     public class Serializer
     {
+#if XML_SERIALIZATION
+        private static string fileLocation = "Mods/TimeLoop/TimeLooper.xml";
+#else
         private static string fileLocation = "Mods/TimeLoop/TimeLooper.json";
+#endif
         private static string absoluteFilePath;
         private int fileSize;
 
         private static Serializer instance;
+#if XML_SERIALIZATION
+        private XmlSerializer xmlSerializer;
+#endif
 
         public bool EnableTimeLooper = true;
 
-        public List<PlayerData> PlayerData = new List<PlayerData>();
-        public List<string> CrossplatformId = new List<string>();
-        public List<bool> SkipTimeLoop = new List<bool>();
+#if XML_SERIALIZATION
+        [XmlArray("KnownPlayers")]
+#endif
+        public List<PlayerData> PlayerData = new List<PlayerData>() { new PlayerData() };
 
         private static string AbsolueFilePath
         {
@@ -54,23 +64,38 @@ namespace TimeLoop.Functions
             if (Directory.Exists(Path.GetDirectoryName(AbsolueFilePath)) && File.Exists(AbsolueFilePath))
             {
                 Log.Out("[TimeLoop] Loading Config ...");
+
+#if XML_SERIALIZATION                
+                using (FileStream fs = new FileStream(AbsolueFilePath, FileMode.Open))
+                {
+                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                    Serializer instance = (Serializer)xmlSerializer.Deserialize(fs);
+                    return instance;
+                }
+#else
                 string jsonString = File.ReadAllText(AbsolueFilePath);
                 Serializer instance = JsonUtility.FromJson<Serializer>(jsonString);
-                #region WORKAROUND
-                for (int i = 0; i < instance.CrossplatformId.Count; i++)
-                {
-                    instance.PlayerData.Add(new PlayerData(instance.CrossplatformId[0], instance.SkipTimeLoop[0]));
-                }
-                #endregion
                 return instance;
+#endif
+
             }
             else
             {
                 Log.Out("[TimeLoop] Creating New Config ...");
+#if XML_SERIALIZATION
+                using (TextWriter writer = new StreamWriter(AbsolueFilePath))
+                {
+                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                    Serializer instance = new Serializer();
+                    xmlSerializer.Serialize(writer, instance);
+                    return instance;
+                }
+#else
                 Serializer instance = new Serializer();
                 string jsonString = JsonUtility.ToJson(instance, true);
                 File.WriteAllText(AbsolueFilePath, jsonString);
                 return instance;
+#endif
             }
         }
 
@@ -93,8 +118,18 @@ namespace TimeLoop.Functions
         {
             if (File.Exists(AbsolueFilePath))
             {
+#if XML_SERIALIZATION
+                using (FileStream fs = new FileStream(AbsolueFilePath, FileMode.Open))
+                {
+                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                    Serializer newInstance = (Serializer)xmlSerializer.Deserialize(fs);
+                    this.EnableTimeLooper = newInstance.EnableTimeLooper;
+                    this.PlayerData = newInstance.PlayerData;
+                }
+#else
                 string jsonString = File.ReadAllText(absoluteFilePath);
                 JsonUtility.FromJsonOverwrite(jsonString, this);
+#endif
                 Log.Out("[TimeLoop] Config Updated!");
             }
         }
@@ -103,8 +138,16 @@ namespace TimeLoop.Functions
         {
             if (File.Exists(AbsolueFilePath))
             {
+#if XML_SERIALIZATION
+                using (TextWriter writer = new StreamWriter(AbsolueFilePath))
+                {
+                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                    xmlSerializer.Serialize(writer, this);
+                }
+#else
                 string jsonString = JsonUtility.ToJson(this, true);
                 File.WriteAllText(AbsolueFilePath, jsonString);
+#endif
                 UpdateFileSize();
             }
         }

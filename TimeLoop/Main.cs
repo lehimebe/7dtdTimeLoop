@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.PlayerLoop;
 using TimeLoop.Modules;
 using TimeLoop.Functions;
-using static UnityDistantTerrain;
+using Platform.Steam;
 
 namespace TimeLoop
 {
@@ -47,16 +42,14 @@ namespace TimeLoop
             {
                 if (cInfo.CrossplatformId != null)
                 {
-                    if (Serializer.Instance.PlayerData?.Exists(x => x.CrossplatformId == cInfo.CrossplatformId.CombinedString) == false)
+                    if (Serializer.Instance.PlayerData?.Exists(
+                        x => (cInfo.PlatformId is UserIdentifierSteam
+                        && x.ID == (cInfo.PlatformId as UserIdentifierSteam).SteamId.ToString()) 
+                        || x.ID == cInfo.CrossplatformId.CombinedString) == false)
                     {
                         Serializer.Instance.PlayerData.Add(new PlayerData(cInfo));
-                        #region WORKAROUND
-                        // Workaround since something is broken here. With Unity I can usually use JsonUtility.ToJson to serialize lists of custom classes, not here though ....
-                        Serializer.Instance.CrossplatformId.Add(cInfo.CrossplatformId.CombinedString);
-                        Serializer.Instance.SkipTimeLoop.Add(false);
-                        #endregion
                         Serializer.Instance.SaveConfig();
-                        Log.Out($"[TimeLoop] Player added to config. {Serializer.Instance.PlayerData.Last().CrossplatformId}");
+                        Log.Out($"[TimeLoop] Player added to config. {Serializer.Instance.PlayerData.Last().ID}");
                     }
                 }
             }

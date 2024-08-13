@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Runtime.Remoting.Messaging;
 using TimeLoop.Functions;
+using Platform.Steam;
 
 
 namespace TimeLoop.Modules
@@ -26,7 +24,10 @@ namespace TimeLoop.Modules
                     continue;
                 }
 
-                PlayerData data = Serializer.Instance.PlayerData?.Find(x => x.CrossplatformId == cInfo.CrossplatformId.CombinedString);
+                PlayerData data = Serializer.Instance.PlayerData?.Find(
+                        x => (cInfo.PlatformId is UserIdentifierSteam
+                        && x.ID == (cInfo.PlatformId as UserIdentifierSteam).SteamId.ToString())
+                        || x.ID == cInfo.CrossplatformId.CombinedString);
                 if (data?.SkipTimeLoop == true)
                 {
                     return;
