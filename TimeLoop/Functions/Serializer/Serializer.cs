@@ -65,13 +65,12 @@ namespace TimeLoop.Functions
             {
                 Log.Out("[TimeLoop] Loading Config ...");
 
-#if XML_SERIALIZATION                
-                using (FileStream fs = new FileStream(AbsolueFilePath, FileMode.Open))
-                {
-                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
-                    Serializer instance = (Serializer)xmlSerializer.Deserialize(fs);
-                    return instance;
-                }
+#if XML_SERIALIZATION               
+                FileStream fs = new FileStream(AbsolueFilePath, FileMode.Open);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                Serializer instance = (Serializer)xmlSerializer.Deserialize(fs);
+                fs.Close();
+                return instance;
 #else
                 string jsonString = File.ReadAllText(AbsolueFilePath);
                 Serializer instance = JsonUtility.FromJson<Serializer>(jsonString);
@@ -83,13 +82,12 @@ namespace TimeLoop.Functions
             {
                 Log.Out("[TimeLoop] Creating New Config ...");
 #if XML_SERIALIZATION
-                using (TextWriter writer = new StreamWriter(AbsolueFilePath))
-                {
-                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
-                    Serializer instance = new Serializer();
-                    xmlSerializer.Serialize(writer, instance);
-                    return instance;
-                }
+                TextWriter writer = new StreamWriter(AbsolueFilePath);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                Serializer instance = new Serializer();
+                xmlSerializer.Serialize(writer, instance);
+                writer.Close();
+                return instance;
 #else
                 Serializer instance = new Serializer();
                 string jsonString = JsonUtility.ToJson(instance, true);
@@ -119,13 +117,12 @@ namespace TimeLoop.Functions
             if (File.Exists(AbsolueFilePath))
             {
 #if XML_SERIALIZATION
-                using (FileStream fs = new FileStream(AbsolueFilePath, FileMode.Open))
-                {
-                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
-                    Serializer newInstance = (Serializer)xmlSerializer.Deserialize(fs);
-                    this.EnableTimeLooper = newInstance.EnableTimeLooper;
-                    this.PlayerData = newInstance.PlayerData;
-                }
+                FileStream fs = new FileStream(AbsolueFilePath, FileMode.Open);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                Serializer newInstance = (Serializer)xmlSerializer.Deserialize(fs);
+                this.EnableTimeLooper = newInstance.EnableTimeLooper;
+                this.PlayerData = newInstance.PlayerData;
+                fs.Close();
 #else
                 string jsonString = File.ReadAllText(absoluteFilePath);
                 JsonUtility.FromJsonOverwrite(jsonString, this);
@@ -139,11 +136,10 @@ namespace TimeLoop.Functions
             if (File.Exists(AbsolueFilePath))
             {
 #if XML_SERIALIZATION
-                using (TextWriter writer = new StreamWriter(AbsolueFilePath))
-                {
-                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
-                    xmlSerializer.Serialize(writer, this);
-                }
+                TextWriter writer = new StreamWriter(AbsolueFilePath);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(Serializer));
+                xmlSerializer.Serialize(writer, this);
+                writer.Close();
 #else
                 string jsonString = JsonUtility.ToJson(this, true);
                 File.WriteAllText(AbsolueFilePath, jsonString);
