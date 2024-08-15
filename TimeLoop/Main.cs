@@ -1,14 +1,21 @@
-﻿using System.Linq;
+﻿#if XML_SERIALIZATION
+using ContentData = TimeLoop.Functions.XmlContentData;
+#else
+using ContentData = TimeLoop.Functions.JsonContentData;
+#endif
+using System.Linq;
 using System.Text;
 using TimeLoop.Modules;
 using TimeLoop.Functions;
 using Platform.Steam;
+using System.Collections.Generic;
 
 namespace TimeLoop
 {
     public class Main : IModApi
     {
         private TimeLooper timeLooper;
+        private ContentData contentData;
 
         public void InitMod(Mod _modInstance)
         {
@@ -16,14 +23,20 @@ namespace TimeLoop
             ModEvents.GameAwake.RegisterHandler(Awake);
             ModEvents.GameUpdate.RegisterHandler(Update);
             ModEvents.PlayerLogin.RegisterHandler(PlayerLogin);
+            //SdtdConsole.Instance.RegisterCommands();
             Log.Out("[TimeLoop] Initialized!");
         }
 
         private void Awake()
         {
-            if (GameManager.Instance != null && GameManager.IsDedicatedServer)
+            if (GameManager.Instance != null && GameManager.IsDedicatedServer && !this.contentData)
             {
-                if (Serializer.Instance.EnableTimeLooper) this.timeLooper = new TimeLooper();
+                // General Initialization
+                this.contentData = ContentData.DeserializeInstance();
+                EnableTimeLoop.ContentData = contentData;
+
+                // Modules
+                this.timeLooper = new TimeLooper(contentData);
             }
         }
 
@@ -31,8 +44,8 @@ namespace TimeLoop
         {
             if (GameManager.Instance != null && GameManager.IsDedicatedServer)
             {
-                Serializer.Instance.CheckForUpdate();
-                this.timeLooper?.Update();
+                contentData?.CheckForUpdate();
+                if (contentData.EnableTimeLooper) this.timeLooper?.Update();
             }
         }
 
@@ -42,14 +55,15 @@ namespace TimeLoop
             {
                 if (cInfo.CrossplatformId != null)
                 {
-                    if (Serializer.Instance.PlayerData?.Exists(
-                        x => (cInfo.PlatformId is UserIdentifierSteam
-                        && x.ID == (cInfo.PlatformId as UserIdentifierSteam).SteamId.ToString()) 
-                        || x.ID == cInfo.CrossplatformId.CombinedString) == false)
+                    if (contentData?.PlayerData?.Exists(
+                        x => (x.ID == cInfo.CrossplatformId.CombinedString)
+                        || (cInfo.PlatformId != null && cInfo.PlatformId is UserIdentifierSteam && x.ID == (cInfo.PlatformId as UserIdentifierSteam).SteamId.ToString()))
+                        == false)
                     {
-                        Serializer.Instance.PlayerData.Add(new PlayerData(cInfo));
-                        Serializer.Instance.SaveConfig();
-                        Log.Out($"[TimeLoop] Player added to config. {Serializer.Instance.PlayerData.Last().ID}");
+                        contentData.PlayerData.Add(new PlayerData(cInfo));
+                        contentData.SaveConfig();
+                        Message.SendPrivateChat("Resetting day. Please wait for an admin in order to experience the normal time flow! Type !adminlist to see available admins.", cInfo);
+                        Log.Out($"[TimeLoop] Player added to config. {contentData.PlayerData.Last().ID}");
                     }
                 }
             }

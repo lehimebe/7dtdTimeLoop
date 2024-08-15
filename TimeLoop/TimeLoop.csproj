@@ -74,8 +74,11 @@
   <ItemGroup>
     <Compile Include="Functions\Message\Message.cs" />
     <Compile Include="Functions\Serializer\PlayerData.cs" />
-    <Compile Include="Functions\Serializer\Serializer.cs" />
+    <Compile Include="Functions\Serializer\XmlContentData.cs" />
+    <Compile Include="Functions\Serializer\JsonContentData.cs" />
+    <Compile Include="Functions\Serializer\XmlSerializerWrapper.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Modules\General\ConsoleCommands.cs" />
     <Compile Include="Modules\TimeLoop\TimeLooper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
