@@ -45,7 +45,7 @@ namespace TimeLoop.Modules
                 if (dayTime == 0)
                 {
                     Log.Out("[TimeLoop] Time Reset.");
-                    Message.SendGlobalChat("Resetting day. Please wait for an admin in order to experience the normal time flow! Type !adminlist to see available admins.");
+                    Message.SendGlobalChat($"Resetting day. Please wait for authorized personnel or enough players to stop the time loop.");
                     int previousDay = GameUtils.WorldTimeToDays(worldTime) - 1;
                     GameManager.Instance.World.SetTime(GameUtils.DaysToWorldTime(previousDay) + 2);
                 }

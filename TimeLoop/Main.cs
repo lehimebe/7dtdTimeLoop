@@ -62,7 +62,7 @@ namespace TimeLoop
                     {
                         contentData.PlayerData.Add(new PlayerData(cInfo));
                         contentData.SaveConfig();
-                        Message.SendPrivateChat("Resetting day. Please wait for an admin in order to experience the normal time flow! Type !adminlist to see available admins.", cInfo);
+                        if (contentData.EnableTimeLooper) Message.SendPrivateChat($"Time loop is active. Therefore the time will reset every 24 hours until the precontition is met.", cInfo);
                         Log.Out($"[TimeLoop] Player added to config. {contentData.PlayerData.Last().ID}");
                     }
                 }
