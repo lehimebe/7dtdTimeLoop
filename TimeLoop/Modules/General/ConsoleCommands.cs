@@ -40,13 +40,24 @@ namespace TimeLoop.Modules
                     switch (commandParams[1])
                     {
                         case "none":
+                        case "0":
                             ContentData.mode = ContentData.Mode.DISABLED;
+                            Log.Out("[TimeLoop] Mod disabled!");
                             break;
                         case "whitelist":
+                        case "1":
                             ContentData.mode = ContentData.Mode.WHITELIST;
+                            Log.Out("[TimeLoop] Whitelist Mode enabled!");
                             break;
                         case "threshold":
+                        case "2":
                             ContentData.mode = ContentData.Mode.MIN_PLAYER_COUNT;
+                            Log.Out("[TimeLoop] Threshold Mode enabled!");
+                            break;
+                        case "whitelisted_threshold":
+                        case "3":
+                            ContentData.mode = ContentData.Mode.MIN_WHITELIST_PLAYER_COUNT;
+                            Log.Out("[TimeLoop] Whitelisted Threshold Mode enabled!");
                             break;
                     }
                     break;
@@ -55,14 +66,17 @@ namespace TimeLoop.Modules
                     {
                         case "min":
                             int.TryParse(commandParams[2], out ContentData.MinPlayers);
+                            Log.Out($"[TimeLoop] Min player count has been set to {commandParams[2]}!");
                             break;
                         case "auth":
                             PlayerData player = ContentData.PlayerData.Find(x => x.PlayerName == commandParams[2]);
                             if (player != null) player.SkipTimeLoop = true;
+                            Log.Out($"[TimeLoop] Player {commandParams[2]} has been authorized!");
                             break;
                         case "refuse":
                             player = ContentData.PlayerData.Find(x => x.PlayerName == commandParams[2]);
                             if (player != null) player.SkipTimeLoop = false;
+                            Log.Out($"[TimeLoop] Player {commandParams[2]} has been unauthorized!");
                             break;
                     }
                     break;
@@ -86,7 +100,7 @@ namespace TimeLoop.Modules
 
         public string GetHelp()
         {
-            return "Syntax is: [timeloop|tilo] [enable|disable|mode|player] [none|whitelist|threshold|min|auth|refuse]";
+            return "Syntax is: [timeloop|tilo] [(enable|disable)|mode|player] [(none|whitelist|threshold|whitelisted_threshold)|(min|auth|refuse)]";
         }
     }
 

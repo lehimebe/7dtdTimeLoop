@@ -23,6 +23,7 @@ namespace TimeLoop
             ModEvents.GameAwake.RegisterHandler(Awake);
             ModEvents.GameUpdate.RegisterHandler(Update);
             ModEvents.PlayerLogin.RegisterHandler(PlayerLogin);
+            ModEvents.PlayerDisconnected.RegisterHandler(PlayerDisconnected);
             //SdtdConsole.Instance.RegisterCommands();
             Log.Out("[TimeLoop] Initialized!");
         }
@@ -69,6 +70,25 @@ namespace TimeLoop
             }
 
             return true;
+        }
+
+        private void PlayerDisconnected(ClientInfo cInfo, bool becauseShutdown)
+        {
+            if (GameManager.Instance != null && GameManager.IsDedicatedServer && cInfo != null)
+            {
+                if (cInfo.CrossplatformId != null)
+                {
+                    // TODO: Player disconnect created new party with new leader
+                    //GameManager.Instance.World.Players.dict.TryGetValue(cInfo.entityId, out EntityPlayer entityPlayer);
+                    //entityPlayer.party.MemberList;
+
+                    // TODO: Window coloring
+                    //foreach (var window in GameManager.Instance.windowManager.windows)
+                    //{
+                    //    Log.Out($"[TimeLoop] Time Reset {window.}.");
+                    //}
+                }
+            }
         }
     }
 }

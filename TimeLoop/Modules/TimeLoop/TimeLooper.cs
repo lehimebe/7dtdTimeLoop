@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using TimeLoop.Functions;
 using Platform.Steam;
+using System;
 
 
 namespace TimeLoop.Modules
@@ -23,22 +24,22 @@ namespace TimeLoop.Modules
 
         public void Update()
         {
-            bool updateTime;
-
             switch (this.contentData.mode)
-            { 
+            {
                 case ContentData.Mode.WHITELIST:
-                    updateTime = CheckIfPlayerOnline();
+                    if(CheckIfAuthPlayerOnline()) return;
                     break;
                 case ContentData.Mode.MIN_PLAYER_COUNT:
-                    updateTime = CheckPlayerCount();
+                    if(CheckIfMinPlayerCountReached()) return;
+                    break;
+                case ContentData.Mode.MIN_WHITELIST_PLAYER_COUNT:
+                    if (CheckIfMinAuthPlayerCountReached()) return;
                     break;
                 default:
-                    updateTime = false;
-                    break;
+                    return;
             }
 
-            if (updateTime && unscaledTimeStamp != UnityEngine.Time.unscaledTimeAsDouble)
+            if (unscaledTimeStamp != UnityEngine.Time.unscaledTimeAsDouble)
             {
                 ulong worldTime = GameManager.Instance.World.GetWorldTime();
                 ulong dayTime = worldTime % 24000;
@@ -54,47 +55,72 @@ namespace TimeLoop.Modules
             }
         }
 
-        private bool CheckIfPlayerOnline()
+        private bool CheckIfAuthPlayerOnline()
         {
             List<ClientInfo> clients = GetConnectedClients();
             for (int i = 0; i < clients.Count; i++)
             {
-                ClientInfo cInfo = clients[i];
-                if (cInfo == null || !cInfo.loginDone || cInfo.CrossplatformId == null || cInfo.PlatformId == null)
+                if (IsClientAuthorized(clients[i]))
                 {
-                    continue;
-                }
-
-                PlayerData data = this.contentData.PlayerData?.Find
-                        (
-                        x => x.ID == cInfo.CrossplatformId.CombinedString ||
-                        (cInfo.PlatformId is UserIdentifierSteam &&
-                        x.ID == (cInfo.PlatformId as UserIdentifierSteam).SteamId.ToString())
-                        );
-                if (data?.SkipTimeLoop == true)
-                {
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
-        private bool CheckPlayerCount()
+        private bool CheckIfMinPlayerCountReached()
         {
             List<ClientInfo> clients = GetConnectedClients();
-            return clients.Count < this.contentData.MinPlayers;
+            return clients.Count >= this.contentData.MinPlayers;
+        }
+
+        private bool CheckIfMinAuthPlayerCountReached()
+        {
+            int authorizedClientCount = 0;
+
+            List<ClientInfo> clients = GetConnectedClients();
+            for (int i = 0; i < clients.Count; i++)
+            {
+                if (IsClientAuthorized(clients[i]))
+                {
+                    authorizedClientCount++;
+                }
+            }
+            return authorizedClientCount >= this.contentData.MinPlayers;
         }
 
         private List<ClientInfo> GetConnectedClients()
         {
             if (ConnectionManager.Instance.Clients != null && ConnectionManager.Instance.Clients.Count > 0)
             {
-                return ConnectionManager.Instance.Clients.List.ToList();
+                return ConnectionManager.Instance.Clients.List.Where(x => 
+                x != null &&
+                x.loginDone &&
+                (x.CrossplatformId != null ||
+                x.PlatformId != null)).ToList();
             }
             else
             {
                 return new List<ClientInfo>();
+            }
+        }
+
+        private bool IsClientAuthorized(ClientInfo cInfo)
+        {
+            PlayerData data = this.contentData.PlayerData?.Find
+                (
+                x => x.ID == cInfo.CrossplatformId.CombinedString ||
+                (cInfo.PlatformId is UserIdentifierSteam &&
+                x.ID == (cInfo.PlatformId as UserIdentifierSteam).SteamId.ToString())
+                );
+            if (data?.SkipTimeLoop == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

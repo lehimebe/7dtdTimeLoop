@@ -16,7 +16,9 @@ namespace TimeLoop.Functions
             [XmlEnum(Name = "whitelist")]
             WHITELIST,
             [XmlEnum(Name = "threshold")]
-            MIN_PLAYER_COUNT
+            MIN_PLAYER_COUNT,
+            [XmlEnum(Name = "whitelisted_threshold")]
+            MIN_WHITELIST_PLAYER_COUNT
         }
 
         #region Singleton
