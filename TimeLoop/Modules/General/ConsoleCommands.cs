@@ -23,24 +23,6 @@ namespace TimeLoop.Modules
 
         public DeviceFlag AllowedDeviceTypesClient => DeviceFlag.StandaloneWindows;
 
-        public bool CanExecuteForDevice
-        {
-            get
-            {
-                if (!Submission.Enabled)
-                {
-                    return true;
-                }
-
-                if (SingletonMonoBehaviour<ConnectionManager>.Instance.IsClient)
-                {
-                    return AllowedDeviceTypesClient.IsCurrent();
-                }
-
-                return AllowedDeviceTypes.IsCurrent();
-            }
-        }
-
         public void Execute(List<string> commandParams, CommandSenderInfo senderInfo)
         {
             if (!ContentData)

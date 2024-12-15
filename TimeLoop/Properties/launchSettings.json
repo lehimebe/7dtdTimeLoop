@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "TimeLoop": {
+      "commandName": "Project"
+    },
+    "Profile 1": {
+      "commandName": "Executable",
+      "executablePath": "<YourServerDirectory>\\7DaysToDieServer.exe",
+      "commandLineArgs": "-logfile \"7DaysToDieServer_Data\\debug_log.txt\" -quit -batchmode -nographics -configfile=serverconfig.xml -dedicated",
+      "workingDirectory": "<YourServerDirectory>"
+    }
+  }
+}

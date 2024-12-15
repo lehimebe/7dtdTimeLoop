@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeLoop", "TimeLoop.csproj", "{587C0609-8B61-4D7C-92E9-BF1849185C2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeLoop", "TimeLoop.csproj", "{15469569-1F8D-417D-A5D3-012312519138}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{587C0609-8B61-4D7C-92E9-BF1849185C2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{587C0609-8B61-4D7C-92E9-BF1849185C2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{587C0609-8B61-4D7C-92E9-BF1849185C2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{587C0609-8B61-4D7C-92E9-BF1849185C2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15469569-1F8D-417D-A5D3-012312519138}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15469569-1F8D-417D-A5D3-012312519138}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15469569-1F8D-417D-A5D3-012312519138}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15469569-1F8D-417D-A5D3-012312519138}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6C060ECE-6FE6-4E26-9CEB-CC9429ED5855}
+		SolutionGuid = {F66D727A-5FFE-46C2-8899-5D0A7BF9291C}
 	EndGlobalSection
 EndGlobal
