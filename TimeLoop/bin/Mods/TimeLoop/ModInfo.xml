@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ModInfo>
   <Name value="TimeLoop" />
-  <Version value="1.2.0" />
+  <Version value="2.0.0" />
   <DisplayName value="TimeLoop" />
-  <Description value="TimeLoop - Game Version 1.0.0" />
+  <Description value="TimeLoop - Game Version 1.1.0" />
   <Author value="leehil" />
   <Website value="https://bitbucket.org/obsessive-coder/sevendaystodie-servertools/downloads/" />
 </ModInfo>

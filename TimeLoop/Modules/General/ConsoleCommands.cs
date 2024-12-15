@@ -5,6 +5,7 @@ using ContentData = TimeLoop.Functions.JsonContentData;
 #endif
 using System.Collections.Generic;
 using TimeLoop.Functions;
+using Platform;
 
 namespace TimeLoop.Modules
 {
@@ -17,6 +18,28 @@ namespace TimeLoop.Modules
         public int DefaultPermissionLevel => 0;
 
         public bool AllowedInMainMenu => false;
+
+        public DeviceFlag AllowedDeviceTypes => DeviceFlag.StandaloneWindows;
+
+        public DeviceFlag AllowedDeviceTypesClient => DeviceFlag.StandaloneWindows;
+
+        public bool CanExecuteForDevice
+        {
+            get
+            {
+                if (!Submission.Enabled)
+                {
+                    return true;
+                }
+
+                if (SingletonMonoBehaviour<ConnectionManager>.Instance.IsClient)
+                {
+                    return AllowedDeviceTypesClient.IsCurrent();
+                }
+
+                return AllowedDeviceTypes.IsCurrent();
+            }
+        }
 
         public void Execute(List<string> commandParams, CommandSenderInfo senderInfo)
         {
@@ -69,7 +92,7 @@ namespace TimeLoop.Modules
                             Log.Out($"[TimeLoop] Min player count has been set to {commandParams[2]}!");
                             break;
                         case "auth":
-                            PlayerData player = ContentData.PlayerData.Find(x => x.PlayerName == commandParams[2]);
+                            TimeLoop.Functions.PlayerData player = ContentData.PlayerData.Find(x => x.PlayerName == commandParams[2]);
                             if (player != null) player.SkipTimeLoop = true;
                             Log.Out($"[TimeLoop] Player {commandParams[2]} has been authorized!");
                             break;

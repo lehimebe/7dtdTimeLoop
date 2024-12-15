@@ -25,7 +25,6 @@ namespace TimeLoop
             ModEvents.PlayerLogin.RegisterHandler(PlayerLogin);
             ModEvents.PlayerDisconnected.RegisterHandler(PlayerDisconnected);
             //SdtdConsole.Instance.RegisterCommands();
-            Log.Out("[TimeLoop] Initialized!");
         }
 
         private void Awake()
@@ -61,7 +60,7 @@ namespace TimeLoop
                         || (cInfo.PlatformId != null && cInfo.PlatformId is UserIdentifierSteam && x.ID == (cInfo.PlatformId as UserIdentifierSteam).SteamId.ToString()))
                         == false)
                     {
-                        contentData.PlayerData.Add(new PlayerData(cInfo));
+                        contentData.PlayerData.Add(new TimeLoop.Functions.PlayerData(cInfo));
                         contentData.SaveConfig();
                         if (contentData.EnableTimeLooper) Message.SendPrivateChat($"Time loop is active. Therefore the time will reset every 24 hours until the precontition is met.", cInfo);
                         Log.Out($"[TimeLoop] Player added to config. {contentData.PlayerData.Last().ID}");
@@ -79,14 +78,31 @@ namespace TimeLoop
                 if (cInfo.CrossplatformId != null)
                 {
                     // TODO: Player disconnect created new party with new leader
-                    //GameManager.Instance.World.Players.dict.TryGetValue(cInfo.entityId, out EntityPlayer entityPlayer);
-                    //entityPlayer.party.MemberList;
+                    if(GameManager.Instance.World.Players.dict.TryGetValue(cInfo.entityId, out EntityPlayer disconnectedPlayer) && disconnectedPlayer == disconnectedPlayer.party?.Leader)
+                    {
+                        List<int> partyMembers = new List<int>();
+                        foreach (EntityPlayer player in disconnectedPlayer.party.MemberList)
+                        {
+                            if (player == disconnectedPlayer) continue;
+
+                            partyMembers.Add(player.entityId);
+                        }
+                        PartyManager.Current.CreateClientParty(GameManager.Instance.World, PartyManager.Current.nextPartyID, 0, partyMembers.ToArray(), disconnectedPlayer.party.VoiceLobbyId);
+                    }
 
                     // TODO: Window coloring
                     //foreach (var window in GameManager.Instance.windowManager.windows)
                     //{
                     //    Log.Out($"[TimeLoop] Time Reset {window.}.");
                     //}
+                    //GameManager.Instance.nguiWindowManager.InGameHUD.
+                    //GameManager.Instance.nguiWindowManager.playerUI
+                    //GameManager.Instance.nguiWindowManager.Windows
+                    //GameManager.Instance.nguiWindowManager.WindowManager.
+
+                    // TODO: Respawn randomly somewhere on map and not at backpack
+                    //GameEventManager.Current.
+                    //GameOptionsManager.
                 }
             }
         }

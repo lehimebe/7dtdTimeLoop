@@ -108,7 +108,7 @@ namespace TimeLoop.Modules
 
         private bool IsClientAuthorized(ClientInfo cInfo)
         {
-            PlayerData data = this.contentData.PlayerData?.Find
+            TimeLoop.Functions.PlayerData data = this.contentData.PlayerData?.Find
                 (
                 x => x.ID == cInfo.CrossplatformId.CombinedString ||
                 (cInfo.PlatformId is UserIdentifierSteam &&
